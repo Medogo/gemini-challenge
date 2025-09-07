@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Social Creative Coach – Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root{
+      --bg: #0b0d10;
+      --panel: #111418;
+      --muted: #6b7280;
+      --text: #e5e7eb;
+      --ring: #94a3b8;
+      --brand: #4f46e5;
+      --brand-2:#22c55e;
+      --border:#1f242b;
+      --code:#0b1020;
+      --danger:#ef4444;
+      --warn:#f59e0b;
+      --ok:#10b981;
+      --radius:14px;
+      --shadow: 0 10px 30px rgba(0,0,0,.25), 0 1px 0 rgba(255,255,255,.04) inset;
+      --shadow-sm: 0 2px 10px rgba(0,0,0,.18);
+      --shadow-ring: 0 0 0 6px rgba(79,70,229,.15);
+      --badge: #1f2937;
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f6f7fb;
+        --panel:#ffffff;
+        --text:#0f172a;
+        --muted:#475569;
+        --ring:#334155;
+        --border:#e5e7eb;
+        --code:#0b1020;
+        --badge:#eef2ff;
+      }
+    }
+
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0; font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg), #000 6%));
+      color:var(--text);
+    }
+
+    .wrap{ max-width:1180px; margin:24px auto; padding:0 16px; }
+    header{ display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:16px; }
+    h1{ font-size: clamp(20px, 2.6vw, 28px); margin:0; letter-spacing:.2px }
+    .sub{ color:var(--muted); font-size:.94rem }
+
+    .grid{ display:grid; grid-template-columns: 1.15fr .9fr; gap:16px }
+    @media (max-width: 980px){ .grid{ grid-template-columns:1fr } }
+
+    .card{
+      background:linear-gradient(180deg, var(--panel), color-mix(in oklab, var(--panel), #000 6%));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      padding:16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .card h3{ margin:0 0 10px 0; font-size:1.02rem }
+    .hint{ color:var(--muted); font-size:.88rem; margin:-2px 0 12px }
+
+    .row{ display:flex; gap:12px; flex-wrap:wrap }
+    .subgrid{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
+    @media (max-width:700px){ .subgrid{ grid-template-columns:1fr } }
+
+    label{ font-size:.84rem; color:var(--muted); display:block; margin:6px 0 6px }
+    textarea, input, select{
+      width:100%; background:#0f1318; color:var(--text);
+      border:1px solid var(--border); border-radius:12px; padding:10px 12px; outline:none;
+      transition:border-color .15s ease, box-shadow .15s ease, transform .06s ease;
+    }
+    @media (prefers-color-scheme: light){
+      textarea, input, select{ background:#fff }
+    }
+    textarea:focus, input:focus, select:focus{ border-color: var(--ring); box-shadow: var(--shadow-ring) }
+    textarea{ resize:vertical; min-height:110px }
+
+    .json-tools{ display:flex; gap:8px; margin-top:6px; }
+    .json-tools button{ font-size:.8rem; padding:8px 10px; }
+
+    .btns{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px }
+    button{
+      appearance:none; border-radius:12px; border:1px solid transparent; padding:10px 14px;
+      background:linear-gradient(180deg, var(--brand), color-mix(in oklab, var(--brand), #000 6%));
+      color:#fff; font-weight:600; cursor:pointer; transition: transform .06s ease, filter .2s ease, opacity .2s;
+      box-shadow: var(--shadow);
+    }
+    button.secondary{
+      background:transparent; color:var(--text); border:1px solid var(--border); box-shadow:none;
+    }
+    button.ghost{ background:transparent; color:var(--muted); border:1px dashed var(--border); box-shadow:none }
+    button:hover{ filter:saturate(1.1) brightness(1.02) }
+    button:active{ transform: translateY(1px) }
+    button[disabled]{ opacity:.6; cursor:not-allowed }
+
+    .cluster{ display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+
+    .drop{
+      border:1px dashed var(--border); border-radius:12px; padding:12px; text-align:center; color:var(--muted);
+      transition:border-color .15s ease, background .15s ease;
+    }
+    .drop.drag{ border-color: var(--brand); background: color-mix(in oklab, var(--panel), var(--brand) 8%) }
+
+    .preview{
+      margin-top:8px; max-width:100%; border:1px solid var(--border); border-radius:10px; display:none;
+    }
+
+    .status{ margin-top:8px; color:var(--muted); font-size:.92rem }
+    .status .ok{ color:var(--ok); font-weight:600 }
+    .status .err{ color:var(--danger); font-weight:600 }
+    .status .warn{ color:var(--warn); font-weight:600 }
+
+    pre{
+      background:var(--code); color:#d2e0ff; padding:14px; border-radius:12px; border:1px solid #111827;
+      overflow:auto; max-height:520px; font-size:.88rem; line-height:1.45;
+    }
+
+    .overlay{
+      position: fixed; inset: 0; background: rgba(0,0,0,.28); backdrop-filter: blur(3px);
+      display:none; place-items: center; z-index: 50;
+    }
+    .loader{
+      width:48px; height:48px; border-radius:50%;
+      border:4px solid #fff; border-top-color:transparent; animation: spin .8s linear infinite;
+      box-shadow: 0 0 0 6px rgba(255,255,255,.08);
+    }
+    @keyframes spin{ to{ transform: rotate(360deg) } }
+
+    .toast{
+      position: fixed; bottom:20px; left:50%; transform: translateX(-50%) translateY(10px); opacity:0;
+      background:#111827; color:#fff; padding:10px 14px; border-radius:12px; border:1px solid #1f2937;
+      box-shadow:var(--shadow-sm); z-index:60; transition: .25s ease;
+    }
+    .toast.show{ opacity:1; transform: translateX(-50%) translateY(0) }
+    .kbd{ font: 600 .78rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; background:#0f172a; color:#e5e7eb; padding:2px 6px; border-radius:6px; border:1px solid #1e293b }
+    .pill{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); color:var(--muted); background:transparent; font-size:.82rem }
+    .sep{ height:1px; background:var(--border); margin:12px 0 }
+    .note{ font-size:.86rem; color:var(--muted); margin-top:6px }
+
+    /* Cards view */
+    .tabs{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:10px }
+    .tab-buttons{ display:flex; gap:6px }
+    .tab{ padding:6px 10px; border-radius:10px; border:1px solid var(--border); cursor:pointer; background:transparent; color:var(--muted); }
+    .tab.active{ color:var(--text); border-color: var(--ring) }
+
+    .cards-wrap{ display:none }
+    .cards-wrap.show{ display:block }
+
+    .cards-toolbar{ display:flex; gap:8px; align-items:center; margin:10px 0 8px }
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      background: var(--badge); color: var(--text);
+      border:1px solid var(--border); border-radius:999px; padding:4px 10px; font-size:.8rem;
+    }
+    .grid-cards{ display:grid; grid-template-columns:1fr; gap:10px }
+    @media (min-width: 420px){ .grid-cards{ grid-template-columns:1fr 1fr } }
+    @media (min-width: 860px){ .grid-cards{ grid-template-columns:1fr 1fr } }
+    .vcard{
+      border:1px solid var(--border); border-radius:12px; padding:12px; background:linear-gradient(180deg, var(--panel), color-mix(in oklab, var(--panel), #000 4%));
+    }
+    .vhead{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px }
+    .vtitle{ font-weight:700; font-size:.98rem; line-height:1.3 }
+    .vbody{ margin:6px 0 8px; white-space:pre-wrap }
+    .vtags{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 }
+    .htag{ background: var(--badge); border:1px solid var(--border); padding:2px 8px; border-radius:999px; font-size:.78rem }
+    .cta{ font-size:.86rem; color:var(--muted) }
+    .channel-section{ margin:14px 0 6px }
+    .channel-title{ font-weight:800; margin:0 0 6px; display:flex; align-items:center; gap:8px }
+    .mini{ font-size:.8rem; color:var(--muted) }
+
+    .sched{ margin-top:14px }
+    .sched h4{ margin:10px 0 6px; font-size:.98rem }
+    .sched ul{ margin:0; padding-left:18px; color:var(--muted) }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Social Creative Coach — Demo</h1>
+        <div class="sub">Interface fluide pour le challenge Google AI Studio. <span class="pill" title="Raccourci">Générer: <span class="kbd">Ctrl</span>+<span class="kbd">Enter</span></span></div>
+      </div>
+      <div class="cluster">
+        <a href="/video/teaser" class="secondary" style="text-decoration:none; padding:10px 14px; border-radius:12px; border:1px solid var(--border)">Teaser vidéo</a>
+        <button id="btnQuick" class="secondary" title="Remplir avec un exemple et charger médias">Exemple rapide</button>
+        <button id="btnReset" class="ghost" title="Réinitialiser le formulaire">Réinitialiser</button>
+        <button id="btnTheme" class="secondary" title="Basculer thème">Thème</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT -->
+      <section class="card" aria-labelledby="entrees">
+        <h3 id="entrees">Entrées</h3>
+        <p class="hint">Ajoute un brief <em>ou</em> une image / un audio-vidéo. Les champs JSON sont validés automatiquement.</p>
+
+        <label for="brief">Brief</label>
+        <textarea id="brief" placeholder="Décris l’idée de campagne… (peut être vide si média joint)"></textarea>
+
+        <div class="subgrid">
+          <div>
+            <label for="channels">Canaux (JSON)</label>
+            <input id="channels" value='["LinkedIn","Instagram","X"]' inputmode="text" spellcheck="false" />
+            <div class="json-tools">
+              <button type="button" class="secondary" data-json="channels" id="fmtChannels">Formater</button>
+              <button type="button" class="secondary" data-json="channels" id="chkChannels">Valider</button>
+            </div>
+          </div>
+          <div>
+            <label for="tone">Ton de marque</label>
+            <input id="tone" value="professionnel, clair, orienté valeur" />
+          </div>
+          <div>
+            <label for="lang">Langue</label>
+            <select id="lang">
+              <option value="fr" selected>fr</option>
+              <option value="en">en</option>
+            </select>
+          </div>
+          <div>
+            <label for="forbid">Forbid (JSON)</label>
+            <input id="forbid" value='[]' inputmode="text" spellcheck="false" />
+            <div class="json-tools">
+              <button type="button" class="secondary" data-json="forbid" id="fmtForbid">Formater</button>
+              <button type="button" class="secondary" data-json="forbid" id="chkForbid">Valider</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="subgrid" style="margin-top:6px;">
+          <div>
+            <label for="tz">Timezone</label>
+            <input id="tz" value="Africa/Porto-Novo" />
+          </div>
+          <div>
+            <label for="project">Projet (exports)</label>
+            <input id="project" value="Social Creative Coach" />
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="subgrid">
+          <div>
+            <label for="brandName">Nom de la marque</label>
+            <input id="brandName" placeholder="ex: Everesti" />
+          </div>
+          <div>
+            <label for="brandColor">Couleur dominante</label>
+            <input id="brandColor" type="color" value="#4f46e5" />
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row" aria-label="Zone de transfert de fichiers">
+          <div style="flex:1 1 260px">
+            <label>Image (optionnel)</label>
+            <div id="dropImage" class="drop">Glisse-dépose une image ou <u>clique</u> pour choisir</div>
+            <input type="file" id="image" accept="image/*" style="display:none" />
+            <img id="preview" class="preview" alt="Aperçu image"/>
+          </div>
+          <div style="flex:1 1 260px">
+            <label>Audio/Vidéo (optionnel)</label>
+            <div id="dropAudio" class="drop">Glisse-dépose un audio/vidéo ou <u>clique</u> pour choisir</div>
+            <input type="file" id="audio" accept="audio/*,video/*" style="display:none" />
+          </div>
+        </div>
+
+        <p class="note">Max: <b>20 Mo</b> pour les images, <b>100 Mo</b> pour audio/vidéo. L’API coupe les médias à 60s pour la transcription.</p>
+
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+
+        <div class="btns">
+          <button id="btnGen" title="Ctrl+Enter">Générer</button>
+          <button id="btnZip" class="secondary">KIT (.zip)</button>
+          <button id="btnICS" class="secondary">Calendrier (.ics)</button>
+          <button id="btnCSV" class="secondary">Posts (.csv)</button>
+          <button id="btnMD"  class="secondary">Markdown (.md)</button>
+        </div>
+      </section>
+
+      <!-- RIGHT -->
+      <aside class="card" aria-labelledby="results">
+        <div class="tabs">
+          <h3 id="results" style="margin:0">Résultats</h3>
+          <div class="tab-buttons">
+            <button class="tab active" id="tabCards">Cartes</button>
+            <button class="tab" id="tabJSON">JSON</button>
+          </div>
+        </div>
+        <p class="hint">Une vue cartes lisible par tous + la vue JSON brute.</p>
+
+        <!-- CARDS VIEW -->
+        <div id="cardsWrap" class="cards-wrap">
+          <div class="cards-toolbar">
+            <span class="badge">Filtrer :</span>
+            <select id="filterChannel">
+              <option value="ALL" selected>Tous les canaux</option>
+              <option value="LinkedIn">LinkedIn</option>
+              <option value="Instagram">Instagram</option>
+              <option value="X">X</option>
+              <option value="Facebook">Facebook</option>
+              <option value="TikTok">TikTok</option>
+            </select>
+            <span class="mini" id="cardsCount"></span>
+          </div>
+          <div id="cardsContainer"></div>
+
+          <div class="sched" id="schedBlock" style="display:none">
+            <h4>Planning proposé (7j)</h4>
+            <div id="schedList"></div>
+          </div>
+        </div>
+
+        <!-- JSON VIEW -->
+        <div id="jsonWrap" style="display:none">
+          <div class="row" style="margin:6px 0 8px">
+            <button id="btnCopy" class="secondary" title="Copier le JSON">Copier JSON</button>
+          </div>
+          <pre id="out" tabindex="0" aria-label="Résultat JSON">{ }</pre>
+          <p class="note" id="noteModel">Note modèles image : configure <code>GEMINI_IMAGE_MODEL</code> côté serveur (ex: <code>gemini-2.5-flash-image-preview</code>). Sinon, placeholders PNG.</p>
+        </div>
+
+        <div class="btns" style="margin-top:14px">
+          <button id="btnIMG">Images (.zip)</button>
+          <button id="btnAnalyze" class="secondary">Analyser l’image</button>
+          <button id="btnAB" class="secondary">A/B Test</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="overlay" class="overlay" aria-hidden="true"><div class="loader" role="progressbar" aria-label="Chargement"></div></div>
+  <div id="toast" class="toast" role="status" aria-live="polite">Copié ✅</div>
+
+  <script>
+    // ====== Config ======
+    const API = location.origin; // adapte si servi par Cloud Run: const API = location.origin;
+
+    // ====== DOM ======
+    const btnGen = document.getElementById("btnGen");
+    const btnZip = document.getElementById("btnZip");
+    const btnICS = document.getElementById("btnICS");
+    const btnCSV = document.getElementById("btnCSV");
+    const btnMD  = document.getElementById("btnMD");
+    const btnIMG = document.getElementById("btnIMG");
+    const btnAB  = document.getElementById("btnAB");
+    const btnAnalyze = document.getElementById("btnAnalyze");
+    const btnCopy = document.getElementById("btnCopy");
+    const btnReset = document.getElementById("btnReset");
+    const btnTheme = document.getElementById("btnTheme");
+    const btnQuick = document.getElementById("btnQuick");
+
+    const tabCards = document.getElementById("tabCards");
+    const tabJSON = document.getElementById("tabJSON");
+    const cardsWrap = document.getElementById("cardsWrap");
+    const jsonWrap = document.getElementById("jsonWrap");
+
+    const out = document.getElementById("out");
+    const statusEl = document.getElementById("status");
+    const imgInput = document.getElementById("image");
+    const audInput = document.getElementById("audio");
+    const styleRef = document.getElementById("styleRef");
+    const imgPreview = document.getElementById("preview");
+    const overlay = document.getElementById("overlay");
+    const toast = document.getElementById("toast");
+    const dropImage = document.getElementById("dropImage");
+    const dropAudio = document.getElementById("dropAudio");
+
+    const filterChannel = document.getElementById("filterChannel");
+    const cardsContainer = document.getElementById("cardsContainer");
+    const cardsCount = document.getElementById("cardsCount");
+    const schedBlock = document.getElementById("schedBlock");
+    const schedList = document.getElementById("schedList");
+
+    const allButtons = [btnGen, btnZip, btnICS, btnCSV, btnMD, btnIMG, btnAB, btnAnalyze, btnCopy, btnQuick];
+    let isBusy = false;
+    let lastResult = null;
+
+    // ====== Helpers ======
+    function toastMsg(msg){ toast.textContent = msg; toast.classList.add("show"); setTimeout(()=>toast.classList.remove("show"), 1600); }
+    function anyInput(){
+      const brief = document.getElementById("brief").value.trim();
+      return !!(brief || imgInput.files[0] || audInput.files[0]);
+    }
+    function fdBase(includeMedia=true){
+      const fd = new FormData();
+      fd.append("brief", document.getElementById("brief").value);
+      fd.append("channels", document.getElementById("channels").value);
+      fd.append("brand_tone", document.getElementById("tone").value);
+      fd.append("language", document.getElementById("lang").value);
+      fd.append("forbid", document.getElementById("forbid").value);
+      fd.append("timezone", document.getElementById("tz").value);
+      fd.append("brand_name", document.getElementById("brandName").value);
+      fd.append("brand_color", document.getElementById("brandColor").value);
+      if(includeMedia){
+        if(imgInput.files[0]) fd.append("image", imgInput.files[0]);
+        if(audInput.files[0]) fd.append("audio", audInput.files[0]);
+      }
+      return fd;
+    }
+    async function post(path, fd, timeoutMs=60000){
+      const ctrl = new AbortController();
+      const t = setTimeout(()=>ctrl.abort(), timeoutMs);
+      const res = await fetch(`${API}${path}`, { method:"POST", body:fd, signal: ctrl.signal }).catch(e=>{
+        if(e.name === "AbortError") throw new Error("Requête expirée (timeout).");
+        throw e;
+      });
+      clearTimeout(t);
+      if(!res.ok){
+        const body = await res.text();
+        throw new Error(`[${res.status}] ${body || res.statusText}`);
+      }
+      return res;
+    }
+    function setBusy(on, btn, label){
+      if(on){
+        if(isBusy) return false;
+        isBusy = true;
+        overlay.style.display = "grid";
+        document.body.setAttribute("aria-busy","true");
+        allButtons.forEach(b => { b.disabled = true; b.dataset.text = b.textContent; });
+        if(btn) btn.innerHTML = `<span class="loader" style="width:18px;height:18px;border-width:2px;border-color:#fff;border-top-color:transparent;vertical-align:-3px;margin-right:8px"></span>${label}`;
+        return true;
+      } else {
+        isBusy = false;
+        overlay.style.display = "none";
+        document.body.removeAttribute("aria-busy");
+        allButtons.forEach(b => { b.disabled = false; b.textContent = b.dataset.text || b.textContent; });
+      }
+    }
+    function validateJSONField(id){
+      const el = document.getElementById(id);
+      try{
+        const parsed = JSON.parse(el.value);
+        el.value = JSON.stringify(parsed);
+        return { ok:true, parsed };
+      }catch(e){
+        return { ok:false, error: e.message };
+      }
+    }
+    function formatJSONField(id){
+      const el = document.getElementById(id);
+      try{
+        const parsed = JSON.parse(el.value);
+        el.value = JSON.stringify(parsed, null, 2);
+        toastMsg("JSON formaté ✔");
+      }catch(e){
+        statusEl.innerHTML = `<span class="err">JSON invalide:</span> ${e.message}`;
+      }
+    }
+
+    // ====== Drag & Drop ======
+    function wireDrop(zone, input, acceptMsg){
+      zone.addEventListener("click", ()=> input.click());
+      ["dragenter","dragover"].forEach(evt => zone.addEventListener(evt, e=>{ e.preventDefault(); e.dataTransfer.dropEffect = "copy"; zone.classList.add("drag"); }));
+      ["dragleave","drop"].forEach(evt => zone.addEventListener(evt, e=>{ e.preventDefault(); zone.classList.remove("drag"); }));
+      zone.addEventListener("drop", e=>{
+        const f = e.dataTransfer.files?.[0]; if(!f) return;
+        input.files = e.dataTransfer.files;
+        if(input===imgInput){ previewImage(); }
+        statusEl.textContent = `${acceptMsg}: ${f.name} (${Math.round(f.size/1024)} Ko)`;
+      });
+    }
+    wireDrop(dropImage, imgInput, "Image sélectionnée");
+    wireDrop(dropAudio, audInput, "Audio/Vidéo sélectionné(e)");
+
+    function previewImage(){
+      const f = imgInput.files[0];
+      if(!f){ imgPreview.style.display="none"; statusEl.textContent=""; return; }
+      if(f.size > 20*1024*1024){ // 20 Mo
+        imgInput.value = "";
+        statusEl.innerHTML = `<span class="err">Image trop lourde</span> (max 20 Mo)`;
+        return;
+      }
+      const url = URL.createObjectURL(f);
+      imgPreview.src = url; imgPreview.style.display = "block";
+      statusEl.innerHTML = `Image sélectionnée: <span class="ok">${f.name}</span> (${Math.round(f.size/1024)} Ko)`;
+    }
+    imgInput.addEventListener("change", previewImage);
+    audInput.addEventListener("change", ()=>{
+      const f = audInput.files[0];
+      if(f){
+        if(f.size > 100*1024*1024){ audInput.value=""; statusEl.innerHTML = `<span class="err">Fichier trop lourd</span> (max 100 Mo)`; return; }
+        statusEl.textContent = `Audio/Vidéo sélectionné(e): ${f.name} (${Math.round(f.size/1024)} Ko)`;
+      }
+    });
+
+    // ====== Tabs (Cards / JSON) ======
+    function showCards(){
+      tabCards.classList.add("active"); tabJSON.classList.remove("active");
+      cardsWrap.classList.add("show"); jsonWrap.style.display="none";
+    }
+    function showJSON(){
+      tabJSON.classList.add("active"); tabCards.classList.remove("active");
+      cardsWrap.classList.remove("show"); jsonWrap.style.display="block";
+    }
+    tabCards.addEventListener("click", showCards);
+    tabJSON.addEventListener("click", showJSON);
+
+    // ====== Cards rendering ======
+    const CH_COLORS = {
+      LinkedIn: "#2563eb",
+      Instagram: "#dc2626",
+      X: "#111827",
+      Facebook: "#0ea5e9",
+      TikTok: "#7c3aed"
+    };
+    function variantToClipboard(v){
+      const tags = (v.hashtags||[]).map(t=>"#"+t).join(" ");
+      let text = "";
+      if(v.channel === "X"){
+        text = `${v.body}\n${tags}`.trim();
+      }else{
+        text = `${v.title ? (v.title + "\n") : ""}${v.body}\n${tags}\n${v.cta||""}`.trim();
+      }
+      return text;
+    }
+    async function copyVariant(v){
+      try{
+        await navigator.clipboard.writeText(variantToClipboard(v));
+        toastMsg("Copié ✅");
+      }catch{ toastMsg("Impossible de copier"); }
+    }
+    function renderSchedule(schedule){
+      if(!schedule || !Array.isArray(schedule.schedule) || schedule.schedule.length===0){
+        schedBlock.style.display = "none";
+        return;
+      }
+      schedBlock.style.display = "block";
+      const wrap = document.createElement("div");
+      schedule.schedule.forEach(ch=>{
+        const h = document.createElement("div");
+        h.innerHTML = `<div class="channel-title"><span class="badge"># ${ch.channel}</span></div>`;
+        const ul = document.createElement("ul");
+        (ch.slots||[]).forEach(s=>{
+          const li = document.createElement("li");
+          li.textContent = `${s.iso} — ${s.why}`;
+          ul.appendChild(li);
+        });
+        h.appendChild(ul);
+        wrap.appendChild(h);
+      });
+      schedList.innerHTML = ""; schedList.appendChild(wrap);
+    }
+    function renderCards(result){
+      lastResult = result;
+      const brandColor = document.getElementById("brandColor").value || "#4f46e5";
+      const variants = ((result?.variants||{}).variants)||[];
+      // group by channel
+      const byChannel = {};
+      variants.forEach(v => {
+        const ch = v.channel || "Unknown";
+        byChannel[ch] = byChannel[ch] || [];
+        byChannel[ch].push(v);
+      });
+
+      const filter = filterChannel.value || "ALL";
+      const container = document.createElement("div");
+      Object.keys(byChannel).forEach(ch=>{
+        if(filter !== "ALL" && ch !== filter) return;
+        const sec = document.createElement("section");
+        sec.className = "channel-section";
+        const count = byChannel[ch].length;
+        sec.innerHTML = `<h4 class="channel-title"><span class="badge" style="border-color:${brandColor};">${ch}</span><span class="mini">(${count} variantes)</span></h4>`;
+        const grid = document.createElement("div");
+        grid.className = "grid-cards";
+
+        byChannel[ch].forEach((v, idx)=>{
+          const card = document.createElement("div");
+          card.className = "vcard";
+          const badgeColor = CH_COLORS[ch] || brandColor;
+          const tagsHtml = (v.hashtags||[]).map(t=>`<span class="htag">#${t}</span>`).join(" ");
+          card.innerHTML = `
+            <div class="vhead">
+              <div class="badge" style="border-color:${badgeColor}">Variante ${idx+1}</div>
+              <div class="row" style="gap:6px">
+                <button class="secondary" data-action="copy">Copier</button>
+              </div>
+            </div>
+            <div class="vtitle">${(v.title||"").replace(/</g,"&lt;")}</div>
+            <div class="vbody">${(v.body||"").replace(/</g,"&lt;").replace(/\n/g,"<br/>")}</div>
+            <div class="vtags">${tagsHtml}</div>
+            <div class="cta"><b>CTA :</b> ${(v.cta||"").replace(/</g,"&lt;")}</div>
+          `;
+          card.querySelector('[data-action="copy"]').addEventListener("click", ()=>copyVariant(v));
+          grid.appendChild(card);
+        });
+
+        sec.appendChild(grid);
+        container.appendChild(sec);
+      });
+
+      cardsContainer.innerHTML = "";
+      cardsContainer.appendChild(container);
+      // counter
+      const total = variants.length;
+      cardsCount.textContent = total ? `${total} variantes` : `Aucune variante`;
+      // schedule
+      renderSchedule(result?.schedule);
+      // switch to cards tab by default
+      showCards();
+    }
+    filterChannel.addEventListener("change", ()=>{ if(lastResult) renderCards(lastResult); });
+
+    // ====== Main actions ======
+    async function runGenerate(){
+      if(!anyInput()){ statusEl.textContent = "Ajoute un brief, une image ou un audio/vidéo avant de lancer."; return; }
+      if(!setBusy(true, btnGen, "Génération…")) return;
+      out.textContent = "{ }"; statusEl.textContent = "Appel à l’API /generate…";
+      try{
+        const res = await post("/generate", fdBase());
+        const json = await res.json();
+        out.textContent = JSON.stringify(json, null, 2);
+        renderCards(json);
+        statusEl.innerHTML = `<span class="ok">Génération terminée</span> ✅`;
+      }catch(e){
+        out.textContent = "Error:\n" + e.message;
+        showJSON();
+        statusEl.innerHTML = `<span class="err">Échec</span> ❌`;
+      }finally{ setBusy(false); }
+    }
+
+    async function downloadBlob(path, name, button, label){
+      if(!anyInput()){ statusEl.textContent = "Ajoute un brief, une image ou un audio/vidéo avant de lancer."; return; }
+      if(!setBusy(true, button, label)) return;
+      try{
+        const fd = fdBase();
+        fd.append("project_name", document.getElementById("project").value || "Social Creative Coach");
+        const res = await post(path, fd);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = Object.assign(document.createElement("a"), { href:url, download:name });
+        a.click(); URL.revokeObjectURL(url);
+        statusEl.innerHTML = `<span class="ok">${name}</span> téléchargé ✅`;
+      }catch(e){
+        out.textContent = "Error:\n" + e.message;
+        showJSON();
+        statusEl.innerHTML = `<span class="err">Échec de l’export</span> ❌`;
+      }finally{ setBusy(false); }
+    }
+
+    async function runImagesZip(){
+      if(!anyInput()){ statusEl.textContent = "Ajoute un brief, une image ou un audio/vidéo avant de lancer."; return; }
+      if(!setBusy(true, btnIMG, "Génération des images…")) return;
+      try{
+        const fd = fdBase();
+        fd.append("project_name", document.getElementById("project").value || "Social Creative Coach");
+        fd.append("images_per_variant", document.getElementById("imagesPerVar")?.value || "1");
+        fd.append("use_model", document.getElementById("useModel")?.value || "auto");
+        if(document.getElementById("styleRef")?.files[0]) fd.append("style_ref", document.getElementById("styleRef").files[0]);
+
+        const res = await post("/images/zip", fd, 120000); // + long
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = Object.assign(document.createElement("a"), { href:url, download:"images.zip" });
+        a.click(); URL.revokeObjectURL(url);
+        statusEl.innerHTML = `<span class="ok">Images.zip</span> téléchargé ✅`;
+      }catch(e){
+        out.textContent = "Error:\n" + e.message;
+        showJSON();
+        statusEl.innerHTML = `<span class="err">Échec des images</span> ❌`;
+      }finally{ setBusy(false); }
+    }
+
+    async function runAB(){
+      if(!anyInput()){ statusEl.textContent = "Ajoute un brief ou une image avant l’A/B."; return; }
+      if(!setBusy(true, btnAB, "A/B Test…")) return;
+      statusEl.textContent = "Appel à l’API /abtest…";
+      const fd = new FormData();
+      // choisit un canal présent, sinon LinkedIn
+      const chs = (()=>{ try{return JSON.parse(document.getElementById("channels").value)}catch{return []} })();
+      const pick = (chs.includes?.("LinkedIn") || chs.includes?.("Instagram")) ? (chs.includes("LinkedIn")?"LinkedIn":"Instagram") : "LinkedIn";
+      fd.append("channel", pick);
+      fd.append("brief", document.getElementById("brief").value);
+      fd.append("language", document.getElementById("lang").value);
+      fd.append("brand_tone", document.getElementById("tone").value);
+      fd.append("hypothesis", "");
+      if(imgInput.files[0]) fd.append("image", imgInput.files[0]);
+
+      try{
+        const res = await post("/abtest", fd);
+        const json = await res.json();
+        out.textContent = JSON.stringify(json, null, 2);
+        showJSON();
+        statusEl.innerHTML = `<span class="ok">A/B Test terminé</span> ✅`;
+      }catch(e){
+        out.textContent = "Error:\n" + e.message;
+        showJSON();
+        statusEl.innerHTML = `<span class="err">A/B Test échoué</span> ❌`;
+      }finally{ setBusy(false); }
+    }
+
+    async function runAnalyze(){
+      if(!imgInput.files[0]){ statusEl.textContent = "Sélectionne d’abord une image pour l’analyser."; return; }
+      if(!setBusy(true, btnAnalyze, "Analyse d’image…")) return;
+      statusEl.textContent = "Appel à l’API /image/analyze…";
+      const fd = new FormData();
+      fd.append("language", document.getElementById("lang").value);
+      fd.append("image", imgInput.files[0]);
+      try{
+        const res = await post("/image/analyze", fd);
+        const json = await res.json();
+        out.textContent = JSON.stringify(json, null, 2);
+        showJSON();
+        statusEl.innerHTML = `<span class="ok">Analyse terminée</span> ✅`;
+      }catch(e){
+        out.textContent = "Error:\n" + e.message;
+        showJSON();
+        statusEl.innerHTML = `<span class="err">Analyse échouée</span> ❌`;
+      }finally{ setBusy(false); }
+    }
+
+    // ====== Exemple rapide ======
+    async function quickExample(){
+      // Remplit le formulaire
+      document.getElementById("brief").value = "Lancement d’une boisson énergisante naturelle, ciblée jeunes actifs. Mettre en avant ingrédients naturels, énergie durable.";
+      document.getElementById("channels").value = '["LinkedIn","Instagram","X"]';
+      document.getElementById("tone").value = "professionnel, clair, orienté valeur";
+      document.getElementById("lang").value = "fr";
+      document.getElementById("forbid").value = '["#love","#instagood"]';
+      document.getElementById("tz").value = "Africa/Porto-Novo";
+      document.getElementById("project").value = "Social Creative Coach";
+      document.getElementById("brandName").value = "Everesti";
+      document.getElementById("brandColor").value = "#4f46e5";
+
+      // Essaye de charger /samples/sample.jpg et /samples/sample.mp3 (si présents côté serveur)
+      try {
+        const imgRes = await fetch("/samples/sample.jpg");
+        if(imgRes.ok){
+          const blob = await imgRes.blob();
+          const file = new File([blob], "sample.jpg", { type: blob.type });
+          const dt = new DataTransfer(); dt.items.add(file);
+          imgInput.files = dt.files;
+          const url = URL.createObjectURL(blob); imgPreview.src = url; imgPreview.style.display="block";
+        }
+      } catch {}
+      try {
+        const audRes = await fetch("/samples/sample.mp3");
+        if(audRes.ok){
+          const blob = await audRes.blob();
+          const file = new File([blob], "sample.mp3", { type: blob.type });
+          const dt = new DataTransfer(); dt.items.add(file);
+          audInput.files = dt.files;
+          statusEl.textContent = `Audio chargé: sample.mp3 (${Math.round(blob.size/1024)} Ko)`;
+        }
+      } catch {}
+      toastMsg("Exemple chargé ✔");
+    }
+
+    // ====== Bind UI ======
+    btnGen.addEventListener("click", runGenerate);
+    btnZip.addEventListener("click", ()=>downloadBlob("/kit","social_kit.zip",btnZip,"Création du KIT…"));
+    btnICS.addEventListener("click", ()=>downloadBlob("/export/ics","schedule.ics",btnICS,"Génération du calendrier…"));
+    btnCSV.addEventListener("click", ()=>downloadBlob("/export/csv","posts.csv",btnCSV,"Génération du CSV…"));
+    btnMD.addEventListener("click", ()=>downloadBlob("/export/md","project.md",btnMD,"Export Markdown…"));
+    btnIMG.addEventListener("click", runImagesZip);
+    btnAB.addEventListener("click", runAB);
+    btnAnalyze.addEventListener("click", runAnalyze);
+    btnCopy.addEventListener("click", async ()=>{
+      try{ await navigator.clipboard.writeText(out.textContent); toastMsg("JSON copié ✅"); }
+      catch{ toastMsg("Impossible de copier"); }
+    });
+    btnQuick.addEventListener("click", quickExample);
+
+    // JSON tools
+    document.getElementById("fmtChannels").onclick = ()=>formatJSONField("channels");
+    document.getElementById("chkChannels").onclick = ()=>{
+      const r = validateJSONField("channels");
+      statusEl.innerHTML = r.ok ? `<span class="ok">Canaux JSON valide</span> ✅` : `<span class="err">Canaux JSON invalide:</span> ${r.error}`;
+    };
+    document.getElementById("fmtForbid").onclick = ()=>formatJSONField("forbid");
+    document.getElementById("chkForbid").onclick = ()=>{
+      const r = validateJSONField("forbid");
+      statusEl.innerHTML = r.ok ? `<span class="ok">Forbid JSON valide</span> ✅` : `<span class="err">Forbid JSON invalide:</span> ${r.error}`;
+    };
+
+    // Keyboard: Ctrl/Cmd+Enter => Generate
+    document.addEventListener("keydown", (e)=>{
+      if((e.ctrlKey||e.metaKey) && e.key === "Enter"){ runGenerate(); }
+    });
+
+    // Reset
+    btnReset.addEventListener("click", ()=>{
+      document.getElementById("brief").value = "";
+      document.getElementById("channels").value = '["LinkedIn","Instagram","X"]';
+      document.getElementById("tone").value = "professionnel, clair, orienté valeur";
+      document.getElementById("lang").value = "fr";
+      document.getElementById("forbid").value = "[]";
+      document.getElementById("tz").value = "Africa/Porto-Novo";
+      document.getElementById("project").value = "Social Creative Coach";
+      document.getElementById("brandName").value = "";
+      document.getElementById("brandColor").value = "#4f46e5";
+      imgInput.value = ""; audInput.value = "";
+      imgPreview.style.display = "none";
+      lastResult = null; cardsContainer.innerHTML = ""; schedList.innerHTML = ""; schedBlock.style.display="none"; cardsCount.textContent="";
+      out.textContent = "{ }"; statusEl.textContent = "Réinitialisé.";
+      toastMsg("Formulaire remis à zéro");
+    });
+
+    // Theme toggle
+    let forcedTheme = null;
+    btnTheme.addEventListener("click", ()=>{
+      forcedTheme = forcedTheme === "light" ? "dark" : (forcedTheme === "dark" ? null : "light");
+      document.documentElement.style.colorScheme = forcedTheme || "normal";
+      toastMsg(forcedTheme ? `Thème ${forcedTheme}` : "Thème système");
+    });
+
+    // Default to cards tab initially
+    showCards();
+  </script>
+</body>
+</html>

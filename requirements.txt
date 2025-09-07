@@ -1,0 +1,47 @@
+# FastAPI et serveur
+fastapi
+uvicorn[standard]
+python-multipart
+
+# Pydantic et settings
+pydantic
+pydantic-settings
+
+# Google AI
+google-generativeai
+
+# Audio processing
+SpeechRecognition
+pydub
+
+
+# Image et file processing
+python-magic
+Pillow
+
+# Date et timezone
+pytz
+
+# HTTP et requests
+httpx
+requests
+
+# JSON et data processing
+orjson
+
+# Logging et monitoring
+structlog
+
+# Sécurité
+python-jose
+passlib
+
+# Variables d'environnement
+python-dotenv
+
+# Tests (optionnel)
+pytest
+pytest-asyncio
+
+# Production
+gunicorn

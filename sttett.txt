@@ -1,0 +1,10 @@
+gcloud run deploy social-coach \
+  --image $IMG \
+  --region europe-west1 \
+  --platform managed \
+  --allow-unauthenticated \
+  --set-env-vars GEMINI_API_KEY="AIzaSyCqs0M2m56FqAJ-liY_FSImG_-RxtpqXYI" \
+  --set-env-vars GEMINI_MODEL="gemini-2.5-flash" \
+  --set-env-vars GEMINI_IMAGE_MODEL="gemini-2.5-flash-image-preview" \
+  --set-env-vars TIMEZONE="Africa/Porto-Novo" \
+  --memory 1Gi --cpu 1 --concurrency 20
