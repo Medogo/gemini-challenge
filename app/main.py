@@ -109,7 +109,7 @@ def _guess_media_format(filename: str | None, content_type: str | None) -> Optio
     return None
 
 
-def convert_media_to_wav_excerpt_mono(media_bytes: bytes, src_format: Optional[str], max_seconds: int = 60) -> bytes:
+def convert_media_to_wav_excerpt_mono(media_bytes: bytes, src_format: Optional[str], max_seconds: int = 30) -> bytes:
     """
     Charge l'audio/vidéo via ffmpeg, coupe aux 60s, normalise en mono 16 kHz WAV.
     """
@@ -929,7 +929,7 @@ def video_teaser():
     Sert un teaser MP4 d'exemple depuis public/samples/teaser.mp4 si présent.
     """
     base = Path(__file__).resolve().parent.parent
-    p = base / "public" / "samples" / "teaser.mp4"
+    p = base / "public" / "samples" / "samples.mp4"
     if p.is_file():
         return FileResponse(str(p), media_type="video/mp4", filename="teaser.mp4")
     raise HTTPException(status_code=501, detail="Aucune vidéo d'exemple disponible.")

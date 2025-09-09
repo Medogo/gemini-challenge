@@ -179,55 +179,56 @@
   </style>
 </head>
 <body>
-  <div class="wrap">
+
+<div class="wrap">
     <header>
       <div>
         <h1>Social Creative Coach — Demo</h1>
-        <div class="sub">Interface fluide pour le challenge Google AI Studio. <span class="pill" title="Raccourci">Générer: <span class="kbd">Ctrl</span>+<span class="kbd">Enter</span></span></div>
+        <div class="sub">Fluid interface for the Google AI Studio challenge. <span class="pill" title="Shortcut">Generate: <span class="kbd">Ctrl</span>+<span class="kbd">Enter</span></span></div>
       </div>
       <div class="cluster">
-        <a href="/video/teaser" class="secondary" style="text-decoration:none; padding:10px 14px; border-radius:12px; border:1px solid var(--border)">Teaser vidéo</a>
-        <button id="btnQuick" class="secondary" title="Remplir avec un exemple et charger médias">Exemple rapide</button>
-        <button id="btnReset" class="ghost" title="Réinitialiser le formulaire">Réinitialiser</button>
-        <button id="btnTheme" class="secondary" title="Basculer thème">Thème</button>
+        <a href="/video/teaser" class="secondary" style="text-decoration:none; padding:10px 14px; border-radius:12px; border:1px solid var(--border)">Video teaser</a>
+        <button id="btnQuick" class="secondary" title="Fill with an example and load media">Quick example</button>
+        <button id="btnReset" class="ghost" title="Reset the form">Reset</button>
+        <button id="btnTheme" class="secondary" title="Toggle theme">Theme</button>
       </div>
     </header>
 
     <div class="grid">
       <!-- LEFT -->
       <section class="card" aria-labelledby="entrees">
-        <h3 id="entrees">Entrées</h3>
-        <p class="hint">Ajoute un brief <em>ou</em> une image / un audio-vidéo. Les champs JSON sont validés automatiquement.</p>
+        <h3 id="entrees">Inputs</h3>
+        <p class="hint">Add a brief <em>or</em> an image / audio-video. JSON fields are automatically validated.</p>
 
         <label for="brief">Brief</label>
-        <textarea id="brief" placeholder="Décris l’idée de campagne… (peut être vide si média joint)"></textarea>
+        <textarea id="brief" placeholder="Describe the campaign idea... (can be empty if media attached)"></textarea>
 
         <div class="subgrid">
           <div>
-            <label for="channels">Canaux (JSON)</label>
+            <label for="channels">Channels (JSON)</label>
             <input id="channels" value='["LinkedIn","Instagram","X"]' inputmode="text" spellcheck="false" />
             <div class="json-tools">
-              <button type="button" class="secondary" data-json="channels" id="fmtChannels">Formater</button>
-              <button type="button" class="secondary" data-json="channels" id="chkChannels">Valider</button>
+              <button type="button" class="secondary" data-json="channels" id="fmtChannels">Format</button>
+              <button type="button" class="secondary" data-json="channels" id="chkChannels">Validate</button>
             </div>
           </div>
           <div>
-            <label for="tone">Ton de marque</label>
-            <input id="tone" value="professionnel, clair, orienté valeur" />
+            <label for="tone">Brand tone</label>
+            <input id="tone" value="professional, clear, value-oriented" />
           </div>
           <div>
-            <label for="lang">Langue</label>
+            <label for="lang">Language</label>
             <select id="lang">
-              <option value="fr" selected>fr</option>
-              <option value="en">en</option>
+              <option value="fr">fr</option>
+              <option value="en" selected>en</option>
             </select>
           </div>
           <div>
             <label for="forbid">Forbid (JSON)</label>
             <input id="forbid" value='[]' inputmode="text" spellcheck="false" />
             <div class="json-tools">
-              <button type="button" class="secondary" data-json="forbid" id="fmtForbid">Formater</button>
-              <button type="button" class="secondary" data-json="forbid" id="chkForbid">Valider</button>
+              <button type="button" class="secondary" data-json="forbid" id="fmtForbid">Format</button>
+              <button type="button" class="secondary" data-json="forbid" id="chkForbid">Validate</button>
             </div>
           </div>
         </div>
@@ -238,7 +239,7 @@
             <input id="tz" value="Africa/Porto-Novo" />
           </div>
           <div>
-            <label for="project">Projet (exports)</label>
+            <label for="project">Project (exports)</label>
             <input id="project" value="Social Creative Coach" />
           </div>
         </div>
@@ -247,39 +248,39 @@
 
         <div class="subgrid">
           <div>
-            <label for="brandName">Nom de la marque</label>
-            <input id="brandName" placeholder="ex: Everesti" />
+            <label for="brandName">Brand name</label>
+            <input id="brandName" placeholder="e.g.: Everesti" />
           </div>
           <div>
-            <label for="brandColor">Couleur dominante</label>
+            <label for="brandColor">Dominant color</label>
             <input id="brandColor" type="color" value="#4f46e5" />
           </div>
         </div>
 
         <div class="sep"></div>
 
-        <div class="row" aria-label="Zone de transfert de fichiers">
+        <div class="row" aria-label="File drop zone">
           <div style="flex:1 1 260px">
-            <label>Image (optionnel)</label>
-            <div id="dropImage" class="drop">Glisse-dépose une image ou <u>clique</u> pour choisir</div>
+            <label>Image (optional)</label>
+            <div id="dropImage" class="drop">Drag & drop an image or <u>click</u> to choose</div>
             <input type="file" id="image" accept="image/*" style="display:none" />
-            <img id="preview" class="preview" alt="Aperçu image"/>
+            <img id="preview" class="preview" alt="Image preview"/>
           </div>
           <div style="flex:1 1 260px">
-            <label>Audio/Vidéo (optionnel)</label>
-            <div id="dropAudio" class="drop">Glisse-dépose un audio/vidéo ou <u>clique</u> pour choisir</div>
+            <label>Audio/Video (optional)</label>
+            <div id="dropAudio" class="drop">Drag & drop an audio/video or <u>click</u> to choose</div>
             <input type="file" id="audio" accept="audio/*,video/*" style="display:none" />
           </div>
         </div>
 
-        <p class="note">Max: <b>20 Mo</b> pour les images, <b>100 Mo</b> pour audio/vidéo. L’API coupe les médias à 60s pour la transcription.</p>
+        <p class="note">Max: <b>20 MB</b> for images, <b>100 MB</b> for audio/video. The API cuts media to 60s for transcription.</p>
 
         <div class="status" id="status" role="status" aria-live="polite"></div>
 
         <div class="btns">
-          <button id="btnGen" title="Ctrl+Enter">Générer</button>
+          <button id="btnGen" title="Ctrl+Enter">Generate</button>
           <button id="btnZip" class="secondary">KIT (.zip)</button>
-          <button id="btnICS" class="secondary">Calendrier (.ics)</button>
+          <button id="btnICS" class="secondary">Calendar (.ics)</button>
           <button id="btnCSV" class="secondary">Posts (.csv)</button>
           <button id="btnMD"  class="secondary">Markdown (.md)</button>
         </div>
@@ -288,20 +289,20 @@
       <!-- RIGHT -->
       <aside class="card" aria-labelledby="results">
         <div class="tabs">
-          <h3 id="results" style="margin:0">Résultats</h3>
+          <h3 id="results" style="margin:0">Results</h3>
           <div class="tab-buttons">
-            <button class="tab active" id="tabCards">Cartes</button>
+            <button class="tab active" id="tabCards">Cards</button>
             <button class="tab" id="tabJSON">JSON</button>
           </div>
         </div>
-        <p class="hint">Une vue cartes lisible par tous + la vue JSON brute.</p>
+        <p class="hint">A readable cards view for everyone + the raw JSON view.</p>
 
         <!-- CARDS VIEW -->
         <div id="cardsWrap" class="cards-wrap">
           <div class="cards-toolbar">
-            <span class="badge">Filtrer :</span>
+            <span class="badge">Filter:</span>
             <select id="filterChannel">
-              <option value="ALL" selected>Tous les canaux</option>
+              <option value="ALL" selected>All channels</option>
               <option value="LinkedIn">LinkedIn</option>
               <option value="Instagram">Instagram</option>
               <option value="X">X</option>
@@ -313,7 +314,7 @@
           <div id="cardsContainer"></div>
 
           <div class="sched" id="schedBlock" style="display:none">
-            <h4>Planning proposé (7j)</h4>
+            <h4>Proposed schedule (7d)</h4>
             <div id="schedList"></div>
           </div>
         </div>
@@ -321,24 +322,23 @@
         <!-- JSON VIEW -->
         <div id="jsonWrap" style="display:none">
           <div class="row" style="margin:6px 0 8px">
-            <button id="btnCopy" class="secondary" title="Copier le JSON">Copier JSON</button>
+            <button id="btnCopy" class="secondary" title="Copy JSON">Copy JSON</button>
           </div>
-          <pre id="out" tabindex="0" aria-label="Résultat JSON">{ }</pre>
-          <p class="note" id="noteModel">Note modèles image : configure <code>GEMINI_IMAGE_MODEL</code> côté serveur (ex: <code>gemini-2.5-flash-image-preview</code>). Sinon, placeholders PNG.</p>
+          <pre id="out" tabindex="0" aria-label="JSON result">{ }</pre>
+          <p class="note" id="noteModel">Image model note: configure <code>GEMINI_IMAGE_MODEL</code> server-side (e.g.: <code>gemini-2.5-flash-image-preview</code>). Otherwise, PNG placeholders.</p>
         </div>
 
         <div class="btns" style="margin-top:14px">
           <button id="btnIMG">Images (.zip)</button>
-          <button id="btnAnalyze" class="secondary">Analyser l’image</button>
+          <button id="btnAnalyze" class="secondary">Analyze image</button>
           <button id="btnAB" class="secondary">A/B Test</button>
         </div>
       </aside>
     </div>
   </div>
 
-  <div id="overlay" class="overlay" aria-hidden="true"><div class="loader" role="progressbar" aria-label="Chargement"></div></div>
-  <div id="toast" class="toast" role="status" aria-live="polite">Copié ✅</div>
-
+  <div id="overlay" class="overlay" aria-hidden="true"><div class="loader" role="progressbar" aria-label="Loading"></div></div>
+  <div id="toast" class="toast" role="status" aria-live="polite">Copied ✅</div>
   <script>
     // ====== Config ======
     const API = location.origin; // adapte si servi par Cloud Run: const API = location.origin;
